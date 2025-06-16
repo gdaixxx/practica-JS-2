@@ -252,6 +252,8 @@ function rendretizarNuevoUsuario(){
             <button class="btn btn-dark" type="button" id="enviar">Enviar</button>
         </div>`
   contenidoWeb.innerHTML = nuevoUsuarioPantalla
+
+  document.getElementById("enviar").addEventListener("click", validarRegistro)
 }
 
 //rendretizarNuevoUsuario()
@@ -407,7 +409,7 @@ document.querySelectorAll(".input-mayusculas").forEach(input => {
 
 */
 
-//document.getElementById("enviar").addEventListener("click", validarRegistro)
+
 
 
 
