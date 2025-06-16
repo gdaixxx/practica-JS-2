@@ -1,9 +1,48 @@
-// Ventana que solicite nombre, dni y correo. No te deje avanzar sin eso. Almacene en local storage / session storage
+const usuarios = [
+  {
+    nombre: "COSME",
+    apellido: "FULANITO",
+    dni: 99_999_999,
+    correo: "COSME@GMAIL.COM",
+    clave: "JAVASCRIPT"
+  }
+]
+
+document.getElementById("newUser").addEventListener("click", rendretizarNuevoUsuario);
 
 
+function loginSubmit(){
+  const userID = document.getElementById("userID").value
+  const pwLogin = document.getElementById("pwLogin").value
+  const usuario = usuarios.find(u => u.dni == Number(userID) && u.clave === pwLogin)
+  if (usuario){
+    
+    sessionStorage.setItem('nombreDeUsuario', `${usuario.nombre} ${usuario.apellido}`)
+    
+    document.getElementById("userName").innerHTML = `Hola, ${usuario.nombre} ${usuario.apellido}`
+    
+    renderizarEscaparate()
 
-const usuarios = []
+  }else{
+    
+    eliminarAlertas()
 
+    const referencia = document.getElementById("formulario-login")
+
+    const contenedorPadre = referencia.parentNode
+    
+    const alerta = document.createElement('div')
+    
+    alerta.innerHTML = 'Algo ha salido mal. Comprobá los datos ingresados.'
+    alerta.classList.add("alert", "alert-danger", "datos-invalidos")
+    
+    contenedorPadre.insertBefore(alerta, referencia)
+    
+  }
+
+}
+
+document.getElementById("loginSubmit").addEventListener("click",loginSubmit)
 
 class Usuario {
     constructor(nombre, apellido, dni, correo, clave) {
@@ -215,7 +254,7 @@ function rendretizarNuevoUsuario(){
   contenidoWeb.innerHTML = nuevoUsuarioPantalla
 }
 
-rendretizarNuevoUsuario()
+//rendretizarNuevoUsuario()
 
 function renderizarEscaparate() {
 	contenidoWeb.innerHTML = `<div class="row row-cols-1 row-cols-md-3 g-4" id="cards-container"> </div>`
@@ -368,7 +407,7 @@ document.querySelectorAll(".input-mayusculas").forEach(input => {
 
 */
 
-document.getElementById("enviar").addEventListener("click", validarRegistro)
+//document.getElementById("enviar").addEventListener("click", validarRegistro)
 
 
 

@@ -21,3 +21,13 @@ main{
     border-radius: 8px;
 }
 
+.resaltado{
+    color: rgb(209, 52, 78);
+    font-weight: 600;
+}
+
+.resaltado:hover{
+    font-weight: 900;   
+    text-decoration: underline wavy pink !important;
+}
+
