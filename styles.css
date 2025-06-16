@@ -1,0 +1,23 @@
+main{
+    padding: 1em;
+    margin-top: 5em
+}
+
+.navbar{
+    border-bottom: 4px pink solid
+}
+
+.sinopsis{
+    text-align:justify;
+    padding:1em;
+}
+
+.input-mayusculas {
+  text-transform: uppercase;
+}
+
+.contenerdor{
+    background-color: rgb(235, 209, 209);
+    border-radius: 8px;
+}
+
