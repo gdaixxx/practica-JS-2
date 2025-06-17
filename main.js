@@ -7,6 +7,7 @@ const usuarios = [
     clave: "JAVASCRIPT"
   }
 ]
+let reserva = []
 
 document.getElementById("newUser").addEventListener("click", rendretizarNuevoUsuario);
 
@@ -62,9 +63,8 @@ function crearUsuario (nombre, apellido, dni, correo, clave){
 
 //Buscador de DNI
 function comprobadorDNI(x){
- return usuarios.some(usuario => usuario.dni === x.value)}
-
-
+ return usuarios.some(usuario => usuario.dni === x.value)
+}
 
 const PDF = ["ALBCUE002","RYUCUE003","EDUCUE004","JULCUE005","MARSOL006","FEDLAI008","JAVVAR009","ROSLOS010","BIBELM011","SOFANT012", "MARTRA001"]
 
@@ -87,7 +87,7 @@ const libros = [
     editorial: "Interzona",
     páginas: 240,
     año: null,
-    ejemplares: 2,
+    ejemplares: 1,
     sinopsis: `<p class="sinopsis"><em>Cuentos de terror</em>, antes de convertirse en este libro, fue un espacio único en la televisión en el cual el rosarino Alberto Laiseca rescató la tradición del relato oral. Transmitido por la señal <em>I-Sat</em>, se volvió un ciclo de culto en el que el escritor
     narraba relatos de terror del siglo XIX. Este volumen reúne aquellos cuentos seleccionados por Laiseca y nos permite volver a oír su particular cadencia al relatar.<br /><br /> “Ya egipcios, romanos, chinos y japoneses tenían cuentos con fantasmas, seres transformados o magos que envían cocodrilos mágicos a casa de sus enemigos. La vieja pregunta es ¿por qué seguimos leyendo (o pidiendo que nos cuenten) historias terroríficas?
     En primer lugar porque nos divierten mucho. Es cosa clara. Todo lo que ‘abre puertas’ gratifica. Pero hay todavía una razón más profunda: los monstruos existen en serio y todos lo sabemos”.<br /></p>`
@@ -256,14 +256,40 @@ function rendretizarNuevoUsuario(){
   document.getElementById("enviar").addEventListener("click", validarRegistro)
 }
 
-//rendretizarNuevoUsuario()
+//
+
+function reservar (codLibro){
+  const libroReservar = libros.find(libro => libro.cod === codLibro)
+    reserva.push(libroReservar)
+    alert("Libro añadido a tus carrito. Seguí navegando por el escaparate o confirmá tu reserva.")
+    libroReservar.ejemplares -= 1
+    if(libroReservar.ejemplares === 0){
+      document.getElementById(libroReservar.cod).outerHTML = `<button type="button" class="btn btn-secondary" id="${libroReservar.cod}">Sin stock</button> `
+    }
+}
+
+function mostrarReservas (){
+  
+}
+
+function eventListenersReserva() {
+    document.querySelectorAll(".reservar").forEach(boton => {
+        boton.addEventListener("click", function() {
+           
+            reservar(this.id)
+
+            console.log(reserva)
+        })
+    })
+}
+
 
 function renderizarEscaparate() {
 	contenidoWeb.innerHTML = `<div class="row row-cols-1 row-cols-md-3 g-4" id="cards-container"> </div>`
   const escaparate = document.getElementById('cards-container')
   libros.forEach((libro) => {
         let verificacionPDF = PDF.includes(libro.cod)
-        if (libro.ejemplares > 0) {verificacionEjemplar = `<a href="#" class="btn btn-primary">Reservar</a>`} else {verificacionEjemplar = `                <button type="button" class="btn btn-secondary">Sin stock</button> `}
+        if (libro.ejemplares > 0) {verificacionEjemplar = `<button class="reservar btn btn-primary" id="${libro.cod}">Reservar</button>`} else {verificacionEjemplar = `<button type="button" class="btn btn-secondary id="${libro.cod}">Sin stock</button> `}
         console.log(verificacionEjemplar)
         let fichaDeLibro = `
         <div class="col">
@@ -299,8 +325,8 @@ function renderizarEscaparate() {
             </div>
         </div>
         </div>`
-        console.log(libro.ejemplares)
-		escaparate.innerHTML += fichaDeLibro
+        escaparate.innerHTML += fichaDeLibro
+        eventListenersReserva()
 	})
 }
 
@@ -327,8 +353,6 @@ function validarCampo(condicion, elemento) {
 function eliminarAlertas() {
     document.querySelectorAll(".alert").forEach(alerta => alerta.remove());
 }
-
-
 
 function validarRegistro(){
 
@@ -410,10 +434,9 @@ document.querySelectorAll(".input-mayusculas").forEach(input => {
 */
 
 
+// AGREGAR LIBROS A RESERVA
+//let reserva = [] // max tres
 
+// CONFIRMAR RESERVA
 
-
-//identificarse()
-//renderizarEscaparate()
-//console.log(libros)
 
