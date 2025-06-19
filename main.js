@@ -321,6 +321,18 @@ function nuevaCard(libro) {
       document.getElementById(`${libro.cod}-reservado`).remove()
       const index = reserva.indexOf("${this.cod}")
       reserva.splice(index, 1)
+      
+      // Aumentamos en uno la cantidad de ejemplares del libro
+      const libroOriginal = libros.find((l) => l.cod === libro.cod)
+      if (libroOriginal) {libroOriginal.ejemplares += 1}
+      
+      const codigoAux = libroOriginal.cod
+      const actualizarBotonStock = document.querySelector(`#`+codigoAux)
+      actualizarBotonStock.textContent="Reservar"
+      actualizarBotonStock.className="reservar btn btn-primary"
+      actualizarBotonStock.addEventListener("click", () => reservar(codigoAux))
+      
+      
     })
   }
 }
@@ -532,7 +544,7 @@ function restringirDNI(input) {
 function bloquearEspacios(input) {
   input.value = input.value.replace(/\s/g, "")
 }
-//function alertas(mensaje,campo,campo)
+
 
 document.querySelector(".input-mayusculas").addEventListener("input", function () {
   this.value = this.value.toUpperCase()
