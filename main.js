@@ -60,7 +60,7 @@ class Usuario {
 function crearUsuario(nombre, apellido, dni, correo, clave) {
   const nuevoUsuario = new Usuario(nombre, apellido, dni, correo, clave)
   usuarios.push(nuevoUsuario)
-  console.log(usuarios)
+  //console.log(usuarios)
 }
 
 //Buscador de DNI

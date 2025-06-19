@@ -4,7 +4,7 @@ main{
 }
 
 .navbar{
-    border-bottom: 4px pink solid
+    border-bottom: 4px pink solid;
 }
 
 .sinopsis{
@@ -48,4 +48,9 @@ main{
     color: pink;
     border: 0;
     font-weight: 500;
+}
+
+#userName{
+    text-transform: capitalize;
+    padding-right: 1em;
 }
