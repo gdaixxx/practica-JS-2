@@ -231,7 +231,7 @@ function rendretizarNuevoUsuario() {
 
             <div class="form-floating mb-3">
                 <input type="text" class="form-control" id="dni" maxlength="8" pattern="[0-9]{7,8}" inputmode="numeric"
-                    oninput="restringirDNI(this)">
+                    oninput="restringirDNI(this)" placeholder="DNI">
                 <label for="dni">DNI</label>
             </div>
             <div class="form-floating mb-3">
