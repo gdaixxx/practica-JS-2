@@ -31,3 +31,21 @@ main{
     text-decoration: underline wavy pink !important;
 }
 
+
+.libroReservado-card{
+    margin-bottom:0.5em;
+}
+
+.btn-primary{
+    background: pink;
+    color:rgb(78, 1, 1);
+    border: 0;
+    font-weight: 500;
+}
+
+.btn-primary:hover{
+    background: rgb(78, 1, 1);
+    color: pink;
+    border: 0;
+    font-weight: 500;
+}

@@ -9,64 +9,66 @@ const usuarios = [
 ]
 let reserva = []
 
-document.getElementById("newUser").addEventListener("click", rendretizarNuevoUsuario);
+document.getElementById("newUser").addEventListener("click", rendretizarNuevoUsuario)
 
+const footer = document.querySelector('footer')
+const userNameEnNavbar = document.getElementById("userName")
 
-function loginSubmit(){
+function loginSubmit() {
   const userID = document.getElementById("userID").value
   const pwLogin = document.getElementById("pwLogin").value
   const usuario = usuarios.find(u => u.dni == Number(userID) && u.clave === pwLogin)
-  if (usuario){
-    
+  if (usuario) {
+
     sessionStorage.setItem('nombreDeUsuario', `${usuario.nombre} ${usuario.apellido}`)
-    
+
     document.getElementById("userName").innerHTML = `Hola, ${usuario.nombre} ${usuario.apellido}`
-    
+
     renderizarEscaparate()
 
-  }else{
-    
+  } else {
+
     eliminarAlertas()
 
     const referencia = document.getElementById("formulario-login")
 
     const contenedorPadre = referencia.parentNode
-    
+
     const alerta = document.createElement('div')
-    
+
     alerta.innerHTML = 'Algo ha salido mal. Comprobá los datos ingresados.'
     alerta.classList.add("alert", "alert-danger", "datos-invalidos")
-    
+
     contenedorPadre.insertBefore(alerta, referencia)
-    
+
   }
 
 }
 
-document.getElementById("loginSubmit").addEventListener("click",loginSubmit)
+document.getElementById("loginSubmit").addEventListener("click", loginSubmit)
 
 class Usuario {
-    constructor(nombre, apellido, dni, correo, clave) {
-        this.nombre = nombre
-        this.apellido = apellido
-        this.dni = dni
-        this.correo = correo
-        this.clave = clave
-    }
+  constructor(nombre, apellido, dni, correo, clave) {
+    this.nombre = nombre
+    this.apellido = apellido
+    this.dni = dni
+    this.correo = correo
+    this.clave = clave
+  }
 }
 
-function crearUsuario (nombre, apellido, dni, correo, clave){
-    const nuevoUsuario = new Usuario(nombre, apellido, dni, correo, clave)
-    usuarios.push(nuevoUsuario)
-    console.log(usuarios)
+function crearUsuario(nombre, apellido, dni, correo, clave) {
+  const nuevoUsuario = new Usuario(nombre, apellido, dni, correo, clave)
+  usuarios.push(nuevoUsuario)
+  console.log(usuarios)
 }
 
 //Buscador de DNI
-function comprobadorDNI(x){
- return usuarios.some(usuario => usuario.dni === x.value)
+function comprobadorDNI(x) {
+  return usuarios.some(usuario => usuario.dni === x.value)
 }
 
-const PDF = ["ALBCUE002","RYUCUE003","EDUCUE004","JULCUE005","MARSOL006","FEDLAI008","JAVVAR009","ROSLOS010","BIBELM011","SOFANT012", "MARTRA001"]
+const PDF = ["ALBCUE002", "RYUCUE003", "EDUCUE004", "JULCUE005", "MARSOL006", "FEDLAI008", "JAVVAR009", "ROSLOS010", "BIBELM011", "SOFANT012", "MARTRA001"]
 
 const libros = [
   {
@@ -100,7 +102,7 @@ const libros = [
     páginas: 112,
     año: 2021,
     ejemplares: 3,
-    sinopsis:`<p class="sinopsis">Este libro nos permite atisbar en una cultura de comple­jidades tan intrincadas y fluctuaciones históricas tan significativas como la japonesa. A pesar de que ninguna antología podría dar una idea general de la producción literaria de un país, la magia
+    sinopsis: `<p class="sinopsis">Este libro nos permite atisbar en una cultura de comple­jidades tan intrincadas y fluctuaciones históricas tan significativas como la japonesa. A pesar de que ninguna antología podría dar una idea general de la producción literaria de un país, la magia
     impar de estos relatos encantará al lector y le acercará el sabor del lejano oriente. Desde su antiquísima tradición imperial, signada por lo simbólico y lo ceremonial, hasta la contemporaneidad de un Japón atravesado por valores occidentales, estos cuentos nos hablan de un mundo tan poco conocido como fascinante.<br /></p>`
   },
   {
@@ -121,7 +123,7 @@ const libros = [
     páginas: 120,
     año: 2017,
     ejemplares: 2,
-    sinopsis: `<p class="sinopsis">Lo fantástico es la irrupción de lo imposible, lo inesperado, en un contexto cotidiano. Esta antología reúne los diez más grandes exponentes del género en América Latina. Por un lado, representantes del fantástico propiamente dicho, en el Río de la Plata, y por el otro, del realismo mágico, en la zona del Caribe. El primero encuentra el asombro sobre todo en la especulación filosófica y la destreza formal; el segundo lo busca en la recuperación imaginaria del tesoro de los pueblos perdidos.<br /></p>`  
+    sinopsis: `<p class="sinopsis">Lo fantástico es la irrupción de lo imposible, lo inesperado, en un contexto cotidiano. Esta antología reúne los diez más grandes exponentes del género en América Latina. Por un lado, representantes del fantástico propiamente dicho, en el Río de la Plata, y por el otro, del realismo mágico, en la zona del Caribe. El primero encuentra el asombro sobre todo en la especulación filosófica y la destreza formal; el segundo lo busca en la recuperación imaginaria del tesoro de los pueblos perdidos.<br /></p>`
   },
   {
     cod: "MARSOL006",
@@ -214,7 +216,7 @@ const libros = [
 
 const contenidoWeb = document.querySelector("main")
 
-function rendretizarNuevoUsuario(){
+function rendretizarNuevoUsuario() {
 
   const nuevoUsuarioPantalla = `<div class="mx-auto col-md-6 m-2 p-4 contenerdor" id="formulario-nuevo-usuario">
             <div class="form-floating mb-3">
@@ -256,42 +258,133 @@ function rendretizarNuevoUsuario(){
   document.getElementById("enviar").addEventListener("click", validarRegistro)
 }
 
-//
-
-function reservar (codLibro){
+function reservar(codLibro) {
   const libroReservar = libros.find(libro => libro.cod === codLibro)
-    reserva.push(libroReservar)
-    alert("Libro añadido a tus carrito. Seguí navegando por el escaparate o confirmá tu reserva.")
-    libroReservar.ejemplares -= 1
-    if(libroReservar.ejemplares === 0){
-      document.getElementById(libroReservar.cod).outerHTML = `<button type="button" class="btn btn-secondary" id="${libroReservar.cod}">Sin stock</button> `
-    }
+  reserva.push(libroReservar)
+  //  alert("Libro añadido a tus carrito. Seguí navegando por el escaparate o confirmá tu reserva.")
+
+  modal(libroReservar)
+  nuevaCard(libroReservar)
+
+  libroReservar.ejemplares -= 1
+
+  const nuevoLibroReservado = new ReservadosCard(
+    libroReservar.cod,
+    libroReservar.titulo,
+    libroReservar.autor,
+    1)
+
+
+
+  if (libroReservar.ejemplares === 0) {
+    document.getElementById(libroReservar.cod).outerHTML = `<button type="button" class="btn btn-secondary" id="${libroReservar.cod}">Sin stock</button> `
+  }
+
+
+
+
 }
 
-function mostrarReservas (){
-  
+//Usar clase para generar cards 
+class ReservadosCard {
+  constructor(cod, titulo, autor, cantidad) {
+    this.cod = cod
+    this.titulo = titulo
+    this.autor = autor
+    this.cantidad = cantidad
+  }
 }
+
+
+function nuevaCard(libro) {
+
+  const carritoDeReservas = document.querySelector(".offcanvas-body")
+
+  console.log(carritoDeReservas)
+
+  const div = document.createElement('div')
+
+  div.innerHTML = `<div class="card p-2 libroReservado-card" id="${libro.cod}-reservado">
+    <div class="card-body">
+    <h5 class="card-title">${libro.título}</h5>
+    <p class="card-text">${libro.autoría}</p>
+    <button class="btn btn-primary" id="${libro.cod}-eliminar">Eliminar</button>
+    </div>
+    </div>`
+
+  carritoDeReservas.appendChild(div)
+
+  const botonEliminarReserva = document.getElementById(`${libro.cod}-eliminar`)
+
+  if (botonEliminarReserva) {
+    botonEliminarReserva.addEventListener("click", () => {
+      document.getElementById(`${libro.cod}-reservado`).remove()
+      const index = reserva.indexOf("${this.cod}")
+      reserva.splice(index, 1)
+    })
+  }
+}
+
+
+
+function modal(libro) {
+  const msje = `¡Excelente! Acabás de añadir a tus reservas "<b>${libro.título}</b> " de <b>${libro.autoría}</b>.`
+
+  const miModalDeConfirmacion = document.getElementById('miModal')
+  let modalElement = document.getElementById('miModal')
+
+  if (!miModalDeConfirmacion) {
+    const div = document.createElement('div');
+    div.innerHTML = `
+          <div class="modal fade" id="miModal">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">✅ Confirmación</h5>
+                  <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">${msje}</div>
+              </div>
+            </div>
+          </div>
+        `
+    document.body.appendChild(div)
+    modalElement = document.getElementById('miModal')
+  } else {
+    // Solo cambia el contenido del body si ya existe
+    const body = modalElement.querySelector('.modal-body')
+    if (body) body.innerHTML = msje
+  }
+
+  // Mostrar el modal
+  const modal = new bootstrap.Modal(modalElement)
+  modal.show()
+
+}
+
+
+
 
 function eventListenersReserva() {
-    document.querySelectorAll(".reservar").forEach(boton => {
-        boton.addEventListener("click", function() {
-           
-            reservar(this.id)
+  document.querySelectorAll(".reservar").forEach(boton => {
+    boton.addEventListener("click", function () {
 
-            console.log(reserva)
-        })
+      reservar(this.id)
+
+      console.log(reserva)
     })
+  })
 }
 
 
 function renderizarEscaparate() {
-	contenidoWeb.innerHTML = `<div class="row row-cols-1 row-cols-md-3 g-4" id="cards-container"> </div>`
+  contenidoWeb.innerHTML = `<div class="row row-cols-1 row-cols-md-3 g-4" id="cards-container"> </div>`
   const escaparate = document.getElementById('cards-container')
   libros.forEach((libro) => {
-        let verificacionPDF = PDF.includes(libro.cod)
-        if (libro.ejemplares > 0) {verificacionEjemplar = `<button class="reservar btn btn-primary" id="${libro.cod}">Reservar</button>`} else {verificacionEjemplar = `<button type="button" class="btn btn-secondary id="${libro.cod}">Sin stock</button> `}
-        console.log(verificacionEjemplar)
-        let fichaDeLibro = `
+    let verificacionPDF = PDF.includes(libro.cod)
+    if (libro.ejemplares > 0) { verificacionEjemplar = `<button class="reservar btn btn-primary" id="${libro.cod}">Reservar</button>` } else { verificacionEjemplar = `<button type="button" class="btn btn-secondary id="${libro.cod}">Sin stock</button> ` }
+    console.log(verificacionEjemplar)
+    let fichaDeLibro = `
         <div class="col">
         <div class="card h-100">
         <img src="./img/${libro.cod}.jpeg" class="card-img-top" alt="...">
@@ -325,118 +418,128 @@ function renderizarEscaparate() {
             </div>
         </div>
         </div>`
-        escaparate.innerHTML += fichaDeLibro
-        eventListenersReserva()
-	})
+    escaparate.innerHTML += fichaDeLibro
+    eventListenersReserva()
+  })
+
+  const renderizarCarritoSidebar = () => {
+    footer.insertAdjacentHTML('beforebegin', `
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasRightLabel">Libros elegidos para reservar</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body g-2 id"></div>
+    </div>
+  `)
+  }
+
+
+  const renderizarSidebarBtn = () => {
+    userNameEnNavbar.insertAdjacentHTML('afterend', `<button class="btn btn-dark" type="button" style="margin-right: 1em" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-archive" viewBox="0 0 16 16">
+  <path d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5zm13-3H1v2h14zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5"/>
+</svg></button>`)
+  }
+
+  renderizarSidebarBtn()
+  renderizarCarritoSidebar()
 }
 
 
-function validacionEmail (email){
-   const plantillaValidacion = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/
-   return plantillaValidacion.test(email)
+function validacionEmail(email) {
+  const plantillaValidacion = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/
+  return plantillaValidacion.test(email)
 }
 
-// intento de funcion de orden superior para evitar código repetido
+//funcion de orden superior para evitar código repetido
 function validarCampo(condicion, elemento) {
-    if (condicion) {
-        elemento.classList.add("is-valid")
-        elemento.classList.remove("is-invalid")
-        datosValidosComprobacion.push(true)
-        
-    } else {
-        elemento.classList.add("is-invalid")
-        elemento.classList.remove("is-valid")
-        datosValidosComprobacion.push(false)
-    }
+  if (condicion) {
+    elemento.classList.add("is-valid")
+    elemento.classList.remove("is-invalid")
+    datosValidosComprobacion.push(true)
+
+  } else {
+    elemento.classList.add("is-invalid")
+    elemento.classList.remove("is-valid")
+    datosValidosComprobacion.push(false)
+  }
 }
 
 function eliminarAlertas() {
-    document.querySelectorAll(".alert").forEach(alerta => alerta.remove());
+  document.querySelectorAll(".alert").forEach(alerta => alerta.remove());
 }
 
-function validarRegistro(){
+function validarRegistro() {
 
-    const pw = document.getElementById("clave")
-    const pw2 = document.getElementById("claveRepetida")
-    const pwTrimmed = pw.value.trim()
-    const mail = document.getElementById("email")  
-    const nombre = document.getElementById("nombre")
-    const nombreTrimmed = nombre.value.trim()
-    const apellido = document.getElementById("apellido")
-    const apellidoTrimmed = apellido.value.trim()
-    const dni = document.getElementById("dni")
-    
-    datosValidosComprobacion = []
+  const pw = document.getElementById("clave")
+  const pw2 = document.getElementById("claveRepetida")
+  const pwTrimmed = pw.value.trim()
+  const mail = document.getElementById("email")
+  const nombre = document.getElementById("nombre")
+  const nombreTrimmed = nombre.value.trim()
+  const apellido = document.getElementById("apellido")
+  const apellidoTrimmed = apellido.value.trim()
+  const dni = document.getElementById("dni")
 
-    // Evaluea cada campo, modifica su estilo según sea o no válido, e incorpora al array datosValidosComprobacion un booleano
-        validarCampo(validacionEmail(mail.value),mail)
-        validarCampo(!nombreTrimmed == false, nombre)
-        // chequea que la comprobación de que no esté vacío el campo (!nombre) y evalúa si es "falso" (o sea, por defecto, si el campo contiene texto) 
-        validarCampo(!apellidoTrimmed == false, apellido)
-        validarCampo(pw.value == pw2.value && !pwTrimmed == false && !pw.value.includes(" "), clave)
-        validarCampo(pw2.value == pw.value && !pwTrimmed == false && !pw2.value.includes(" "), claveRepetida)
-        validarCampo(dni.value > 10_000_000, dni)
-    
-    const esValido = datosValidosComprobacion.every(comprobacion => comprobacion === true)
+  datosValidosComprobacion = []
 
-    const referencia = document.getElementById("formulario-nuevo-usuario")
+  // Evaluea cada campo, modifica su estilo según sea o no válido, e incorpora al array datosValidosComprobacion un booleano
+  validarCampo(validacionEmail(mail.value), mail)
+  validarCampo(!nombreTrimmed == false, nombre)
+  // chequea que la comprobación de que no esté vacío el campo (!nombre) y evalúa si es "falso" (o sea, por defecto, si el campo contiene texto) 
+  validarCampo(!apellidoTrimmed == false, apellido)
+  validarCampo(pw.value == pw2.value && !pwTrimmed == false && !pw.value.includes(" "), clave)
+  validarCampo(pw2.value == pw.value && !pwTrimmed == false && !pw2.value.includes(" "), claveRepetida)
+  validarCampo(dni.value > 10_000_000, dni)
 
-    const contenedorPadre = referencia.parentNode // Hice esto porque como el div no está suelto en el body sino dentro de manin JS no encontraba el nodo en el dom
+  const esValido = datosValidosComprobacion.every(comprobacion => comprobacion === true)
 
-    console.log("Intentando eliminar alertas...")
-    eliminarAlertas()
+  const referencia = document.getElementById("formulario-nuevo-usuario")
 
-    //Validación general    
-    switch (true){
-        case esValido && comprobadorDNI(dni) === false:
-            crearUsuario(nombre.value, apellido.value, dni.value, mail.value, pw.value) // si los datos son válidos y el DNI no existe
-            sessionStorage.setItem('nombreDeUsuario', `${nombre.value} ${apellido.value}`)
-            document.getElementById("userName").innerHTML = `Hola, ${nombre.value} ${apellido.value}`
-            renderizarEscaparate()
-            break
-        
-        case comprobadorDNI(dni) === true:
-            const alertaDNI = document.createElement('div')
-            alertaDNI.innerHTML = 'Ya existe un usuario registrado con tu número de DNI. Si olvidaste tu contraseña, contactate con el admin.'
-            alertaDNI.classList.add("alert", "alert-danger", "DNI-existe")
-            contenedorPadre.insertBefore(alertaDNI, referencia)
-            break
-            
-        case esValido === false:
-            const alerta = document.createElement('div')
-            alerta.innerHTML = 'Algo ha salido mal. Comprobá los datos ingresados.'
-            alerta.classList.add("alert", "alert-danger", "datos-invalidos")
-            contenedorPadre.insertBefore(alerta, referencia)
-            break
-    }
+  const contenedorPadre = referencia.parentNode // Hice esto porque como el div no está suelto en el body sino dentro de manin JS no encontraba el nodo en el dom
+
+  eliminarAlertas()
+
+  //Validación general    
+  switch (true) {
+    case esValido && comprobadorDNI(dni) === false:
+      crearUsuario(nombre.value, apellido.value, dni.value, mail.value, pw.value) // si los datos son válidos y el DNI no existe
+      sessionStorage.setItem('nombreDeUsuario', `${nombre.value} ${apellido.value}`)
+      document.getElementById("userName").innerHTML = `Hola, ${nombre.value} ${apellido.value}`
+      renderizarEscaparate()
+      break
+
+    case comprobadorDNI(dni) === true:
+      const alertaDNI = document.createElement('div')
+      alertaDNI.innerHTML = 'Ya existe un usuario registrado con tu número de DNI. Si olvidaste tu contraseña, contactate con el admin.'
+      alertaDNI.classList.add("alert", "alert-danger", "DNI-existe")
+      contenedorPadre.insertBefore(alertaDNI, referencia)
+      break
+
+    case esValido === false:
+      const alerta = document.createElement('div')
+      alerta.innerHTML = 'Algo ha salido mal. Comprobá los datos ingresados.'
+      alerta.classList.add("alert", "alert-danger", "datos-invalidos")
+      contenedorPadre.insertBefore(alerta, referencia)
+      break
+  }
 }
-    
+
 function restringirDNI(input) {
-    input.value = input.value.replace(/[^0-9]/g, "")
+  input.value = input.value.replace(/[^0-9]/g, "")
 }
 
 function bloquearEspacios(input) {
-    input.value = input.value.replace(/\s/g, "")
+  input.value = input.value.replace(/\s/g, "")
 }
 //function alertas(mensaje,campo,campo)
 
-document.querySelector(".input-mayusculas").addEventListener("input", function() {
-    this.value = this.value.toUpperCase()
+document.querySelector(".input-mayusculas").addEventListener("input", function () {
+  this.value = this.value.toUpperCase()
 })
 
-/*
-document.querySelectorAll(".input-mayusculas").forEach(input => {
-    input.addEventListener("input", function() {
-        this.value = this.value.toUpperCase();
-    });
-});
-
-*/
 
 
-// AGREGAR LIBROS A RESERVA
-//let reserva = [] // max tres
-
-// CONFIRMAR RESERVA
+// FALTA IMPLEMENTAR: CONFIRMACIÓN DE RESERVA
 
 
