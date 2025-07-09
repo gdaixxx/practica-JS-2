@@ -1,10 +1,18 @@
+body{
+    margin-top: 3em;
+}
+
 main{
     padding: 1em;
-    margin-top: 5em
+}
+
+.main-logueado{
+        margin-top: 116px;
 }
 
 .navbar{
     border-bottom: 4px pink solid;
+    margin-bottom: 6em;
 }
 
 .sinopsis{
@@ -53,4 +61,18 @@ main{
 #userName{
     text-transform: capitalize;
     padding-right: 1em;
+}
+
+#buscador{
+    margin-left: 0.8em;
+    margin-right: 0.8em;
+    margin-top: 0.5em;
+    margin-bottom: 0.2em;
+}
+
+
+
+.offcanvas-footer {
+  background-color: #f8f9fa;
+  text-align: center;
 }
