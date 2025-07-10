@@ -10,6 +10,17 @@ const usuarios = [
 
 let reserva = []
 
+let PDF = []
+
+const urlLibros = "./libros.json"
+
+let libros = []
+
+let paginasEscaparate
+
+const contenidoWeb = document.querySelector("main")
+
+
 document.getElementById("newUser").addEventListener("click", rendretizarNuevoUsuario)
 
 const footer = document.querySelector('footer')
@@ -52,7 +63,18 @@ async function getData() {
   }
 }
 
-
+const barraDeNavegacion = `<div class="botones-paginacion">
+            
+            <button  class="btn btn-primary flecha" onclick="paginaAnterior()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+  <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z"/>
+</svg></button>
+            
+            <div class="div"><span id="pagActual">d</span> de <span id="pagTotal">d</span></div>
+            
+            <button class="btn btn-primary flecha" onclick="paginaSiguiente()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-circle-fill" viewBox="0 0 16 16">
+  <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0M4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z"/>
+</svg></button>
+        </div>`
 
 function loginSubmit() {
   const barraDeBusqueda = `<input class="form-control" id="buscador" type="text" placeholder="Buscar..." aria-label="default input example">`
@@ -68,6 +90,8 @@ function loginSubmit() {
     document.getElementById("userName").innerHTML = `Hola, ${usuario.nombre} ${usuario.apellido}`
 
     getData()
+
+    document.querySelector('footer').insertAdjacentHTML('beforeend', barraDeNavegacion)
 
     document.querySelector('nav').insertAdjacentHTML('beforeend', barraDeBusqueda)
 
@@ -109,7 +133,7 @@ class Usuario {
 function crearUsuario(nombre, apellido, dni, correo, clave) {
   const nuevoUsuario = new Usuario(nombre, apellido, dni, correo, clave)
   usuarios.push(nuevoUsuario)
-  sessionStorage.setItem('correoDeUsuario', `${correo}`)
+  sessionStorage.setItem('mailDeUsuario', `${correo}`)
   sessionStorage.setItem('nombreDeUsuario', `${nombre} ${apellido}`)
 }
 
@@ -118,15 +142,6 @@ function comprobadorDNI(x) {
   return usuarios.some(usuario => usuario.dni === x.value)
 }
 
-let PDF = []
-
-const urlLibros = "./libros.json"
-
-let libros = []
-
-let paginasEscaparate
-
-const contenidoWeb = document.querySelector("main")
 
 
 function rendretizarNuevoUsuario() {
@@ -176,17 +191,23 @@ function reservar(codLibro) {
   const verificarEspacioCarrito = () => reserva.length <= 2
 
 
-  if (verificarEspacioCarrito()) { console.log("Hay espacio en el carrito") } else {
-    alert("No podés reservar más de 3 libros a la vez. Por favor, eliminá alguno de tu carrito para continuar.")
+  if (!verificarEspacioCarrito()) {
+    
+    cargarSweetAlert().then(() => {
+      Swal.fire({
+        title: "¡Reserva confirmada!",
+        text: "No podés reservar más de 3 libros a la vez. Por favor, eliminá alguno de tu carrito para continuar.",
+        icon: "warning"
+      })
+    })
+
     return
   }
 
   const libroReservar = libros.find(libro => libro.cod === codLibro)
+  
   reserva.push(libroReservar)
   activadorBotonConfirmar()
-
-  //  alert("Libro añadido a tus carrito. Seguí navegando por el escaparate o confirmá tu reserva.")
-
   modal(libroReservar)
   nuevaCard(libroReservar)
 
@@ -217,96 +238,110 @@ class ReservadosCard {
 
 
 function nuevaCard(libro) {
-
   const carritoDeReservas = document.querySelector(".offcanvas-body")
+  const index = reserva.lastIndexOf(libro)
+  const idUnico = `${libro.cod}-${index}`
 
   const div = document.createElement('div')
-
-  div.innerHTML = `<div class="card p-2 libroReservado-card" id="${libro.cod}-reservado">
+  div.innerHTML = `<div class="card p-2 libroReservado-card" id="${idUnico}-reservado">
     <div class="card-body">
-    <h5 class="card-title">${libro.título}</h5>
-    <p class="card-text">${libro.autoría}</p>
-    <button class="btn btn-primary" id="${libro.cod}-eliminar">Eliminar</button>
+      <h5 class="card-title">${libro.título}</h5>
+      <p class="card-text">${libro.autoría}</p>
+      <button class="btn btn-primary" id="${idUnico}-eliminar" data-cod="${libro.cod}">Eliminar</button>
     </div>
-    </div>`
+  </div>`
 
   carritoDeReservas.appendChild(div)
 
-  const botonEliminarReserva = document.getElementById(`${libro.cod}-eliminar`)
+  const botonEliminarReserva = document.getElementById(`${idUnico}-eliminar`)
 
-  if (botonEliminarReserva) {
-    botonEliminarReserva.addEventListener("click", () => {
-      document.getElementById(`${libro.cod}-reservado`).remove()
-      const index = reserva.indexOf("${this.cod}")
-      reserva.splice(index, 1)
-      activadorBotonConfirmar()
+  // Define el handler fuera para poder removerlo si hiciera falta
+  function handleEliminarReserva() {
 
-      // Aumentamos en uno la cantidad de ejemplares del libro
-      const libroOriginal = libros.find((l) => l.cod === libro.cod)
-      if (libroOriginal) { libroOriginal.ejemplares += 1 }
+    // Reconoce elimina la card del DOM usando el idUnico
+    // Recupera del dataset del div el código identificador del libro
+    // Elimina la card
+    
+    const cardDiv = document.getElementById(`${idUnico}-reservado`)
+    
+    const cod = cardDiv.dataset.cod
+    
+    cardDiv.remove()
 
-      const codigoAux = libroOriginal.cod
-      const actualizarBotonStock = document.querySelector(`#` + codigoAux)
+    // Busco el índice del libro en el array reservas a partir del código del libro
+    const index = reserva.findIndex((libro) => libro.cod === cod)
+
+    // verificar si el índice es válido antes de eliminar para evitar errores
+    if (index === -1) {reserva.splice(index, 1)}
+    
+
+    reserva.splice(index, 1)
+
+    activadorBotonConfirmar()
+
+    // Aumenta el stock del libro eliminado de la reserva
+    const libroOriginal = libros.find((l) => l.cod === libro.cod)
+    if (libroOriginal) {libroOriginal.ejemplares += 1}
+
+    // Actualiza el botón de stock     
+    const actualizarBotonStock = document.querySelector(`#${libro.cod}`)
+
+    if (actualizarBotonStock) {
       actualizarBotonStock.textContent = "Reservar"
       actualizarBotonStock.className = "reservar btn btn-primary"
-      actualizarBotonStock.addEventListener("click", () => reservar(codigoAux))
+      actualizarBotonStock.removeEventListener("click", reservarHandler)
+      actualizarBotonStock.addEventListener("click", reservarHandler)
+    }
+  }
 
-
-    })
+  if (botonEliminarReserva) {
+    botonEliminarReserva.addEventListener("click", handleEliminarReserva)
   }
 }
-
-
 
 function modal(libro) {
   const msje = `¡Excelente! Acabás de añadir a tus reservas "<b>${libro.título}</b> " de <b>${libro.autoría}</b>.`
 
-  const miModalDeConfirmacion = document.getElementById('miModal')
-  let modalElement = document.getElementById('miModal')
+  // Elimina todos los modals previos
+  document.querySelectorAll('#miModal').forEach(m => m.remove());
+  // Elimina backdrop si quedó alguno
+  document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
 
-  if (!miModalDeConfirmacion) {
-    const div = document.createElement('div');
-    div.innerHTML = `
-          <div class="modal fade" id="miModal">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title">✅ Confirmación</h5>
-                  <button class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">${msje}</div>
-              </div>
-            </div>
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <div class="modal fade" id="miModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">✅ Confirmación</h5>
+            <button class="btn-close" data-bs-dismiss="modal"></button>
           </div>
-        `
-    document.body.appendChild(div)
-    modalElement = document.getElementById('miModal')
-  } else {
-    // Solo cambia el contenido del body si ya existe
-    const body = modalElement.querySelector('.modal-body')
-    if (body) body.innerHTML = msje
-  }
+          <div class="modal-body">${msje}</div>
+        </div>
+      </div>
+    </div>
+  `
+  document.body.appendChild(div)
+  const modalElement = document.getElementById('miModal')
 
-  // Mostrar el modal
+  // Crea y ejecuta el modal
   const modal = new bootstrap.Modal(modalElement)
   modal.show()
 
+  // Elimina el modal del DOM al cerrarse
+  modalElement.addEventListener('hidden.bs.modal', () => {
+    div.remove();
+  });
 }
 
-
-
+function reservarHandler() {reservar(this.id)}
 
 function eventListenersReserva() {
   document.querySelectorAll(".reservar").forEach(boton => {
-    boton.addEventListener("click", function () {
-
-      reservar(this.id)
-
-
-    })
+    boton.removeEventListener("click", reservarHandler)
+    boton.addEventListener("click", reservarHandler)
   })
 }
-
 
 // PAGINACION
 let paginaActual = 0
@@ -378,6 +413,7 @@ function renderizarEscaparate(libros) {
     escaparate.innerHTML += fichaDeLibro
     eventListenersReserva()
   })
+
   // Desactivar/activar botones
   document.querySelector("button[onclick='paginaAnterior()']").disabled = paginaActual === 0
   document.querySelector("button[onclick='paginaSiguiente()']").disabled = fin >= libros.length
@@ -546,39 +582,31 @@ const finalizarReserva = () => {
   })
 
   const botonConfirmar = document.getElementById("confirmar")
-  
+
   botonConfirmar.disabled = true
 }
 
 
 
+function handleConfirmarReserva() {
+  const mensajeEmailDeConfirmacion = `Hola, <b>${sessionStorage.getItem('nombreDeUsuario').toUpperCase()}</b>!<br><br>Acabás de reservar los siguientes libros:<br><br><ul>${reserva.map(libro => `<li><b>${libro.título}</b> de <b>${libro.autoría}</b></li>`).join('')}</ul><br><hr><br>  ¡Recordá que tenés tres días para retirarlos en la biblioteca y dos semanas completas para leerlos y devolverlos!<br><br>No dudes en contactarnos si tenés alguna duda o consulta.<br><hr><br>`
+  enviarCorreo(mensajeEmailDeConfirmacion)
+  finalizarReserva()
+}
 
 function activadorBotonConfirmar() {
   const botonConfirmar = document.getElementById("confirmar")
 
-  if (reserva.length > 0) {
-    botonConfirmar.disabled = false
-    botonConfirmar.addEventListener("click", function () {
-      const mensajeEmailDeConfirmacion = `Hola, <b>${sessionStorage.getItem('nombreDeUsuario')}</b>!<br><br>
-  Acabás de reservar los siguientes libros:<br><br>
-  <ul>
-  ${reserva.map(libro => `<li><b>${libro.título}</b> de <b>${libro.autoría}</b></li>`).join('')}</ul><br><hr><br>
-  ¡Recordá que tenés tres días para retirarlos en la biblioteca y dos semanas completas para leerlos y devolverlos!<br><br>No dudes en contactarnos si tenés alguna duda o consulta.<br><hr><br>`
-      enviarCorreo(mensajeEmailDeConfirmacion)
-      finalizarReserva()
-    })
-  } else {
-    botonConfirmar.disabled = true
-    botonConfirmar.removeEventListener("click", function () {
-      const mensajeEmailDeConfirmacion = `Hola, <b>${sessionStorage.getItem('nombreDeUsuario').toUpperCase()}</b>!<br><br>
-  Acabás de reservar los siguientes libros:<br><br>
-  <ul>
-  ${reserva.map(libro => `<li><b>${libro.título}</b> de <b>${libro.autoría}</b></li>`).join('')}</ul><br><hr><br>
-  ¡Recordá que tenés tres días para retirarlos en la biblioteca y dos semanas completas para leerlos y devolverlos!<br><br>No dudes en contactarnos si tenés alguna duda o consulta.<br><hr><br>`
-      enviarCorreo(mensajeEmailDeConfirmacion)
-      finalizarReserva()
+  // Clona el botón de confirmar reserva en el DOM para evitar problemas de eventos duplicados y que no se envíen múlples correos de confirmación de la reserva
 
-    })
+  const nuevoBoton = botonConfirmar.cloneNode(true);
+  botonConfirmar.parentNode.replaceChild(nuevoBoton, botonConfirmar)
+
+  if (reserva.length > 0) {
+    nuevoBoton.disabled = false;
+    nuevoBoton.addEventListener("click", handleConfirmarReserva)
+  } else {
+    nuevoBoton.disabled = true;
   }
 }
 
