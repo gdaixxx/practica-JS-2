@@ -10,6 +10,7 @@ const usuarios = [
 
 let reserva = []
 
+let librosPrestados = []
 
 const PDF = ["ALBCUE002", "RYUCUE003", "EDUCUE004", "JULCUE005", "MARSOL006", "FEDLAI008", "JAVVAR009", "ROSLOS010", "BIBELM011", "SOFANT012", "MARTRA001"]
 
@@ -588,7 +589,27 @@ document.querySelector(".input-mayusculas").addEventListener("input", function (
   this.value = this.value.toUpperCase()
 })
 
+// Guarda los préstamos en mi array de control (si hubiera una base de datos, se haría un POST a la misma) 
+function guardarPrestamo(reserva) {
+  const nombreApellido = sessionStorage.getItem('nombreDeUsuario')
+  const correo = sessionStorage.getItem('mailDeUsuario')
+  const fecha = new Date().toLocaleString()
 
+  const librosReservados = reserva.map(libro => ({
+    cod: libro.cod,
+    titulo: libro.título,
+    autor: libro.autoría
+  }))
+
+  const nuevaReserva = {
+    usuario: nombreApellido,
+    correo: correo,
+    fecha: fecha,
+    libros: librosReservados
+  }
+
+  librosPrestados.push(nuevaReserva);
+}
 
 // CONFIRMACIÓN DE RESERVA
 
@@ -597,7 +618,9 @@ const finalizarReserva = () => {
   const contenedorPadre = document.querySelector(".offcanvas-body")
 
   contenedorPadre.innerHTML = ""
-
+  
+  guardarPrestamo(reserva)
+  
   reserva = []
 
   cargarSweetAlert().then(() => {
