@@ -10,13 +10,26 @@ const usuarios = [
 
 let reserva = []
 
-let PDF = []
 
-const urlLibros = "./libros.json"
+const PDF = ["ALBCUE002", "RYUCUE003", "EDUCUE004", "JULCUE005", "MARSOL006", "FEDLAI008", "JAVVAR009", "ROSLOS010", "BIBELM011", "SOFANT012", "MARTRA001"]
 
 let libros = []
 
+const urlLibros = "./libros.json"
+
 let paginasEscaparate
+
+function indicadorNumeroItemsEnCarrito() {
+  const items = reserva.length
+  const contador = document.querySelector(".contador-items")
+
+  if (items > 0) {
+    contador.textContent = items
+    contador.style.display = "inline-block"
+  } else {
+    contador.style.display = "none"
+  }
+}
 
 const contenidoWeb = document.querySelector("main")
 
@@ -75,6 +88,19 @@ const barraDeNavegacion = `<div class="botones-paginacion">
   <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0M4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z"/>
 </svg></button>
         </div>`
+
+const renderizarSidebarBtn = () => {
+  if (!document.getElementById('btnSidebarReserva')) {
+    userNameEnNavbar.insertAdjacentHTML('afterend', `
+        <button id="btnSidebarReserva" class="btn btn-dark posicionContador" type="button" style="margin-right: 1em" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-archive" viewBox="0 0 16 16">
+            <path d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5zm13-3H1v2h14zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5"/>
+          </svg>
+          <span class="contador-items" style="display: none;">1</span>
+        </button>
+      `)
+  }
+}
 
 function loginSubmit() {
   const barraDeBusqueda = `<input class="form-control" id="buscador" type="text" placeholder="Buscar..." aria-label="default input example">`
@@ -192,7 +218,7 @@ function reservar(codLibro) {
 
 
   if (!verificarEspacioCarrito()) {
-    
+
     cargarSweetAlert().then(() => {
       Swal.fire({
         title: "¡Reserva confirmada!",
@@ -205,11 +231,12 @@ function reservar(codLibro) {
   }
 
   const libroReservar = libros.find(libro => libro.cod === codLibro)
-  
+
   reserva.push(libroReservar)
   activadorBotonConfirmar()
   modal(libroReservar)
   nuevaCard(libroReservar)
+  indicadorNumeroItemsEnCarrito()
 
   libroReservar.ejemplares -= 1
 
@@ -221,7 +248,9 @@ function reservar(codLibro) {
 
 
   if (libroReservar.ejemplares === 0) {
-    document.getElementById(libroReservar.cod).outerHTML = `<button type="button" class="btn btn-secondary" id="${libroReservar.cod}">Sin stock</button> `
+    document.getElementById(libroReservar.cod).outerHTML = `<button type="button" class="btn btn-secondary" id="${libroReservar.cod}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-ban" viewBox="0 0 16 16">
+  <path d="M15 8a6.97 6.97 0 0 0-1.71-4.584l-9.874 9.875A7 7 0 0 0 15 8M2.71 12.584l9.874-9.875a7 7 0 0 0-9.874 9.874ZM16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0"/>
+</svg></button> `
   }
 
 }
@@ -243,11 +272,11 @@ function nuevaCard(libro) {
   const idUnico = `${libro.cod}-${index}`
 
   const div = document.createElement('div')
-  div.innerHTML = `<div class="card p-2 libroReservado-card" id="${idUnico}-reservado">
+  div.innerHTML = `<div class="card p-2 libroReservado-card" id="${idUnico}-reservado" data-cod="${libro.cod}">
     <div class="card-body">
       <h5 class="card-title">${libro.título}</h5>
       <p class="card-text">${libro.autoría}</p>
-      <button class="btn btn-primary" id="${idUnico}-eliminar" data-cod="${libro.cod}">Eliminar</button>
+      <button class="btn btn-primary" id="${idUnico}-eliminar">Eliminar</button>
     </div>
   </div>`
 
@@ -261,27 +290,26 @@ function nuevaCard(libro) {
     // Reconoce elimina la card del DOM usando el idUnico
     // Recupera del dataset del div el código identificador del libro
     // Elimina la card
-    
+
     const cardDiv = document.getElementById(`${idUnico}-reservado`)
-    
+    console.log(cardDiv)
     const cod = cardDiv.dataset.cod
-    
+    console.log(cod)
     cardDiv.remove()
 
     // Busco el índice del libro en el array reservas a partir del código del libro
     const index = reserva.findIndex((libro) => libro.cod === cod)
-
+    console.log(index)
     // verificar si el índice es válido antes de eliminar para evitar errores
-    if (index === -1) {reserva.splice(index, 1)}
-    
+    if (index !== -1) { reserva.splice(index, 1) }
 
-    reserva.splice(index, 1)
 
     activadorBotonConfirmar()
 
+
     // Aumenta el stock del libro eliminado de la reserva
     const libroOriginal = libros.find((l) => l.cod === libro.cod)
-    if (libroOriginal) {libroOriginal.ejemplares += 1}
+    if (libroOriginal) { libroOriginal.ejemplares += 1 }
 
     // Actualiza el botón de stock     
     const actualizarBotonStock = document.querySelector(`#${libro.cod}`)
@@ -291,12 +319,20 @@ function nuevaCard(libro) {
       actualizarBotonStock.className = "reservar btn btn-primary"
       actualizarBotonStock.removeEventListener("click", reservarHandler)
       actualizarBotonStock.addEventListener("click", reservarHandler)
+      indicadorNumeroItemsEnCarrito()
+    }
+
+    if (reserva.length === 0) {
+      const offcanvas = document.getElementById('offcanvasRight')
+      const instancia = bootstrap.Offcanvas.getInstance(offcanvas)
+      instancia.hide()
     }
   }
 
   if (botonEliminarReserva) {
     botonEliminarReserva.addEventListener("click", handleEliminarReserva)
   }
+
 }
 
 function modal(libro) {
@@ -334,7 +370,7 @@ function modal(libro) {
   });
 }
 
-function reservarHandler() {reservar(this.id)}
+function reservarHandler() { reservar(this.id) }
 
 function eventListenersReserva() {
   document.querySelectorAll(".reservar").forEach(boton => {
@@ -360,7 +396,9 @@ function renderizarEscaparate(libros) {
 
   librosPagina.forEach((libro) => {
     let verificacionPDF = PDF.includes(libro.cod)
-    if (libro.ejemplares > 0) { verificacionEjemplar = `<button class="reservar btn btn-primary" id="${libro.cod}">Reservar</button>` } else { verificacionEjemplar = `<button type="button" class="btn btn-secondary id="${libro.cod}">Sin stock</button> ` }
+    if (libro.ejemplares > 0) { verificacionEjemplar = `<button class="reservar btn btn-primary" id="${libro.cod}">Reservar</button>` } else { verificacionEjemplar = `<button type="button" class="btn btn-secondary id="${libro.cod}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-ban" viewBox="0 0 16 16">
+  <path d="M15 8a6.97 6.97 0 0 0-1.71-4.584l-9.874 9.875A7 7 0 0 0 15 8M2.71 12.584l9.874-9.875a7 7 0 0 0-9.874 9.874ZM16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0"/>
+</svg></button> ` }
 
 
     let texto = libro.autoría
@@ -387,7 +425,9 @@ function renderizarEscaparate(libros) {
         <div class="container text-center">
         <div class="row g-2">
             <div class="col">${verificacionEjemplar}</div>
-        ${verificacionPDF ? `    <div class="col"><a href="./pdf/${libro.cod}.pdf" target="_blank" class="btn btn-primary">Previsualizar</a></div>` : ""}
+        ${verificacionPDF ? `    <div class="col"><a href="./pdf/${libro.cod}.pdf" target="_blank" class="btn btn-primary"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-filetype-pdf" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M14 4.5V14a2 2 0 0 1-2 2h-1v-1h1a1 1 0 0 0 1-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5zM1.6 11.85H0v3.999h.791v-1.342h.803q.43 0 .732-.173.305-.175.463-.474a1.4 1.4 0 0 0 .161-.677q0-.375-.158-.677a1.2 1.2 0 0 0-.46-.477q-.3-.18-.732-.179m.545 1.333a.8.8 0 0 1-.085.38.57.57 0 0 1-.238.241.8.8 0 0 1-.375.082H.788V12.48h.66q.327 0 .512.181.185.183.185.522m1.217-1.333v3.999h1.46q.602 0 .998-.237a1.45 1.45 0 0 0 .595-.689q.196-.45.196-1.084 0-.63-.196-1.075a1.43 1.43 0 0 0-.589-.68q-.396-.234-1.005-.234zm.791.645h.563q.371 0 .609.152a.9.9 0 0 1 .354.454q.118.302.118.753a2.3 2.3 0 0 1-.068.592 1.1 1.1 0 0 1-.196.422.8.8 0 0 1-.334.252 1.3 1.3 0 0 1-.483.082h-.563zm3.743 1.763v1.591h-.79V11.85h2.548v.653H7.896v1.117h1.606v.638z"/>
+</svg></a></div>` : ""}
         <div class="col"><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#${libro.cod}+modal">Sinopsis</button></div>
         </div>
         </div>
@@ -435,19 +475,6 @@ function renderizarEscaparate(libros) {
     </div>
   `)
     const botonConfirmar = document.getElementById("confirmar")
-  }
-
-
-  const renderizarSidebarBtn = () => {
-    if (!document.getElementById('btnSidebarReserva')) {
-      userNameEnNavbar.insertAdjacentHTML('afterend', `
-        <button id="btnSidebarReserva" class="btn btn-dark" type="button" style="margin-right: 1em" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-archive" viewBox="0 0 16 16">
-            <path d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5zm13-3H1v2h14zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5"/>
-          </svg>
-        </button>
-      `)
-    }
   }
 
   renderizarSidebarBtn()
@@ -584,6 +611,7 @@ const finalizarReserva = () => {
   const botonConfirmar = document.getElementById("confirmar")
 
   botonConfirmar.disabled = true
+  indicadorNumeroItemsEnCarrito()
 }
 
 
