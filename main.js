@@ -292,14 +292,14 @@ function nuevaCard(libro) {
     // Elimina la card
 
     const cardDiv = document.getElementById(`${idUnico}-reservado`)
-    console.log(cardDiv)
+
     const cod = cardDiv.dataset.cod
-    console.log(cod)
+
     cardDiv.remove()
 
     // Busco el índice del libro en el array reservas a partir del código del libro
     const index = reserva.findIndex((libro) => libro.cod === cod)
-    console.log(index)
+
     // verificar si el índice es válido antes de eliminar para evitar errores
     if (index !== -1) { reserva.splice(index, 1) }
 
@@ -668,7 +668,6 @@ async function enviarCorreo(mensajeEmailDeConfirmacion) {
       mensaje: mensajeEmailDeConfirmacion,
     })
 
-    console.log("Correo enviado ✅")
   } catch (error) {
     console.error("Error al enviar el correo ❌", error)
   }
