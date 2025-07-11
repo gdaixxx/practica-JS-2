@@ -73,7 +73,7 @@ async function getData() {
   }
 
   catch (error) {
-    console.log("Hay un error", error)
+    console.error("Hay un error", error)
   }
 }
 
