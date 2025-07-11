@@ -419,7 +419,7 @@ function renderizarEscaparate(libros) {
     let fichaDeLibro = `
         <div class="col">
         <div class="card h-100">
-        <img src= "./img/${libro.cod}.jpeg" class="card-img-top" alt="..." onerror="this.onerror=null; this.src='./img/book-placeholder.jpg';">
+        <img src="./img/${libro.cod}.jpeg" class="card-img-top" alt="..." onerror="this.onerror=null; this.src='./img/book-placeholder.jpg';">
         <div class="card-body">
         <h5 class="card-title">${libro.título}</h5>
         <p class="card-text">${acortamientoDeAutores()}</p>
