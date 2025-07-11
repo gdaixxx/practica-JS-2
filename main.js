@@ -221,8 +221,8 @@ function reservar(codLibro) {
 
     cargarSweetAlert().then(() => {
       Swal.fire({
-        title: "¡Reserva confirmada!",
-        text: "No podés reservar más de 3 libros a la vez. Por favor, eliminá alguno de tu carrito para continuar.",
+        title: "Imposible agregar más libros",
+        text: "No podés reservar más de 3 ejemplares a la vez. Por favor, eliminá alguno de tu carrito para continuar.",
         icon: "warning"
       })
     })
